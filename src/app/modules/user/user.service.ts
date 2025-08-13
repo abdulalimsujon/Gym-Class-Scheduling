@@ -36,20 +36,34 @@ export const getUserById = async (id: string) => {
 
 // UPDATE USER
 export const updateUser = async (id: string, payload: Partial<IUser>) => {
-  if (!Types.ObjectId.isValid(id))
+  if (!Types.ObjectId.isValid(id)) {
     throw new AppError(httpStatus.BAD_REQUEST, 'Invalid user ID');
+  }
 
-  if (payload.password)
+  // Check if user exists and is not deleted
+  const existingUser = await UserModel.findOne({ _id: id });
+  if (!existingUser || existingUser.isDeleted) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found or deleted');
+  }
+
+  // Prevent email change if trying to update
+  if (payload.email && payload.email !== existingUser.email) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Email cannot be changed for this user',
+    );
+  }
+
+  // Hash password if being updated
+  if (payload.password) {
     payload.password = await bcrypt.hash(payload.password, 10);
+  }
 
-  const user = await UserModel.findOneAndUpdate(
-    { _id: id, isDeleted: false },
-    payload,
-    { new: true },
-  );
-  if (!user) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
+  const updatedUser = await UserModel.findByIdAndUpdate(id, payload, {
+    new: true,
+  });
 
-  return user;
+  return updatedUser;
 };
 
 // SOFT DELETE USER
@@ -74,7 +88,7 @@ export const deleteUser = async (id: string) => {
 
 // PROFILE MANAGEMENT (get/update current user)
 export const getMyProfile = async (userId: string) => {
-  return getUserById(userId);
+  return UserModel.findOne({ _id: userId });
 };
 
 export const updateMyProfile = async (

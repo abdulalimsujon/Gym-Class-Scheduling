@@ -1,31 +1,25 @@
-import { TLoginUser, TLoginResponse, TRegisterUser } from './auth.interface';
+import { TLoginUser, TRegisterUser } from './auth.interface';
 
 import bcrypt from 'bcrypt';
 import httpStatus from 'http-status';
 import { createToken } from '../../utilities/createToken';
+
+import AppError from '../../Errors/AppError';
 import { UserModel } from '../user/user.model';
 
 // LOGIN SERVICE
-export const loginUser = async (
-  payload: TLoginUser,
-): Promise<TLoginResponse> => {
+export const loginUser = async (payload: TLoginUser) => {
   const { email, password } = payload;
 
   const user = await UserModel.findOne({ email }).select('+password');
 
   if (!user) {
-    throw {
-      statusCode: httpStatus.UNAUTHORIZED,
-      message: 'User not found',
-    };
+    throw new AppError(httpStatus.UNAUTHORIZED, 'User not found');
   }
 
   const isPasswordMatched = await bcrypt.compare(password, user.password);
   if (!isPasswordMatched) {
-    throw {
-      statusCode: httpStatus.UNAUTHORIZED,
-      message: 'Password is incorrect',
-    };
+    throw new AppError(httpStatus.UNAUTHORIZED, 'Password is incorrect');
   }
 
   // Include role in token
@@ -45,10 +39,7 @@ export const registerUser = async (payload: TRegisterUser) => {
   // Check if email exists
   const existing = await UserModel.findOne({ email });
   if (existing) {
-    throw {
-      statusCode: httpStatus.BAD_REQUEST,
-      message: 'Email already registered',
-    };
+    throw new AppError(httpStatus.CONFLICT, 'Duplicate Error');
   }
 
   // Hash password

@@ -4,6 +4,7 @@ import { bookingController } from './booking.controller';
 import Auth from '../../middleware/Auth';
 import { UserRole } from '../user/user.interface';
 
+
 const router = express.Router();
 
 router.post(

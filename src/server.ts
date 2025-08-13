@@ -5,7 +5,6 @@ import app from './app';
 import bcrypt from 'bcrypt';
 import { UserModel } from './app/modules/user/user.model';
 import { UserRole } from './app/modules/user/user.interface';
-
 let server: Server;
 
 // Admin seeding function

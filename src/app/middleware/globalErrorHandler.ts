@@ -19,7 +19,7 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
 
   let errorSources: TErrorSources = [
     {
-      path: '',
+      field: '',
       message,
     },
   ];
@@ -28,29 +28,29 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     const simplifliedError = handleZodError(error);
     statusCode = simplifliedError?.statusCode;
     message = simplifliedError?.message;
-    errorSources = simplifliedError?.errorSources;
+    errorSources = simplifliedError?.errorDetails;
   } else if (error?.name === 'ValidationError') {
     const simplifliedError = handleValidationError(error);
     statusCode = simplifliedError?.statusCode;
     message = simplifliedError?.message;
-    errorSources = simplifliedError?.errorSources;
+    errorSources = simplifliedError?.errorDetails;
   } else if (error?.name === 'CastError') {
     const simplifliedError = handleCastError(error);
     statusCode = simplifliedError?.statusCode;
     message = simplifliedError?.message;
-    errorSources = simplifliedError?.errorSources;
+    errorSources = simplifliedError?.errorDetails;
   } else if (error?.code === 11000) {
     const simplifliedError = handleDublicateKeyError(error);
     statusCode = simplifliedError?.statusCode;
     message = simplifliedError?.message;
-    errorSources = simplifliedError?.errorSources;
+    errorSources = simplifliedError?.errorDetails;
   } else if (error instanceof AppError) {
     statusCode = error?.statusCode;
     message = error?.message;
 
     errorSources = [
       {
-        path: '',
+        field: '',
         message: error?.message,
       },
     ];
@@ -58,7 +58,7 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     message = error?.message;
     errorSources = [
       {
-        path: '',
+        field: '',
         message: error?.message,
       },
     ];
@@ -68,8 +68,8 @@ const globalErrorHandler: ErrorRequestHandler = (error, req, res, next) => {
     success: false,
     message,
     // error,
-    errorSources,
-    stack: config.node_env=== 'development' ? error.stack : null,
+    errorDetails: errorSources,
+    stack: config.node_env === 'development' ? error.stack : null,
   });
 };
 

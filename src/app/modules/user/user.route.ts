@@ -6,11 +6,15 @@ import { UserRole } from './user.interface';
 const router = Router();
 
 // CRUD routes (Admin can manage users)
-router.post('/', Auth(UserRole.ADMIN), userController.create);
+router.post('/create', Auth(UserRole.ADMIN), userController.create);
 router.get('/', Auth(UserRole.ADMIN), userController.getAll);
-router.get('/:id', Auth(UserRole.ADMIN), userController.getById);
-router.put('/:id', Auth(UserRole.ADMIN), userController.update);
-router.delete('/:id', Auth(UserRole.ADMIN), userController.remove);
+router.get(
+  '/single/:id',
+  Auth(UserRole.ADMIN, UserRole.TRAINEE, UserRole.TRAINER),
+  userController.getById,
+);
+router.put('/update/:id', Auth(UserRole.ADMIN), userController.update);
+router.delete('/delete/:id', Auth(UserRole.ADMIN), userController.remove);
 
 // Profile routes (All roles)
 router.get(
@@ -19,7 +23,7 @@ router.get(
   userController.getProfile,
 );
 router.put(
-  '/profile',
+  '/setting/profile',
   Auth(UserRole.ADMIN, UserRole.TRAINEE, UserRole.TRAINER),
   userController.updateProfile,
 );

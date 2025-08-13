@@ -65,7 +65,7 @@ const remove = catchAsync(async (req: Request, res: Response) => {
 
 // PROFILE
 const getProfile = catchAsync(async (req: Request, res: Response) => {
-  const result = await getMyProfile(req.user._id);
+  const result = await getMyProfile(req.user.id);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
@@ -75,7 +75,7 @@ const getProfile = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateProfile = catchAsync(async (req: Request, res: Response) => {
-  const result = await updateMyProfile(req.user._id, req.body);
+  const result = await updateMyProfile(req.user.id, req.body);
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,

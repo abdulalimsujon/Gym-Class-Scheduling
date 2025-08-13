@@ -3,6 +3,7 @@ import { classController } from './class.controller';
 import Auth from '../../middleware/Auth';
 import { UserRole } from '../user/user.interface';
 
+
 const router = express.Router();
 
 // Admin-only routes

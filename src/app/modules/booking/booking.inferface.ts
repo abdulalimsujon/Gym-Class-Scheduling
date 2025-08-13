@@ -1,8 +1,8 @@
 import { Types } from 'mongoose';
 
-export interface IBooking {
+export interface IBooking extends Document {
   trainee: Types.ObjectId;
   classSchedule: Types.ObjectId;
-  isDeleted?: boolean;
+  isDeleted: boolean;
   createdAt: Date;
 }

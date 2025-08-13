@@ -1,11 +1,5 @@
-import { Schema, model, Document, Types } from 'mongoose';
-
-export interface IBooking extends Document {
-  trainee: Types.ObjectId;
-  classSchedule: Types.ObjectId;
-  isDeleted: boolean;
-  createdAt: Date;
-}
+import { Schema, model } from 'mongoose';
+import { IBooking } from './booking.inferface';
 
 const bookingSchema = new Schema<IBooking>(
   {
