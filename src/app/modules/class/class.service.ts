@@ -3,12 +3,20 @@ import { Types } from 'mongoose';
 import httpStatus from 'http-status';
 import AppError from '../../Errors/AppError';
 import { IClassSchedule } from './class.interface';
+import { UserModel } from '../user/user.model';
 
 const createClass = async (payload: {
   date: Date;
   trainer: Types.ObjectId;
 }) => {
   const { date, trainer } = payload;
+  const existingTrainer = await UserModel.findOne({
+    _id: payload.trainer,
+    isDeleted: false,
+  });
+  if (!existingTrainer) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Trainer not found or deleted');
+  }
 
   const startOfDay = new Date(date);
   startOfDay.setHours(0, 0, 0, 0);
@@ -74,6 +82,12 @@ const deleteClass = async (id: string): Promise<IClassSchedule> => {
   }
   return deletedClass;
 };
+const getMyClasses = async (userId: Types.ObjectId) => {
+  return ClassScheduleModel.find({
+    trainer: userId,
+    isDeleted: false,
+  }).populate('trainer', 'name email role');
+};
 
 export const classService = {
   createClass,
@@ -81,4 +95,5 @@ export const classService = {
   getSingleClass,
   updateClass,
   deleteClass,
+  getMyClasses,
 };

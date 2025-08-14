@@ -6,10 +6,15 @@ import catchAsync from '../../utilities/catchAsync';
 import sendResponse from '../../utilities/sendResponse/sendResponse';
 
 const createBooking = catchAsync(async (req: Request, res: Response) => {
-  const { classScheduleId } = req.body;
-  const traineeId = req.user._id;
+  const reqBody = req.body;
+  const userRole = req.user.role;
+  const trainee = req.user.id;
 
-  const result = await bookingService.createBooking(traineeId, classScheduleId);
+  const result = await bookingService.createBooking({
+    ...reqBody,
+    trainee,
+    userRole,
+  });
 
   sendResponse(res, {
     statusCode: httpStatus.CREATED,
@@ -20,7 +25,7 @@ const createBooking = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMyBookings = catchAsync(async (req: Request, res: Response) => {
-  const traineeId = req.user._id;
+  const traineeId = req.user.id;
   const result = await bookingService.getMyBookings(traineeId);
 
   sendResponse(res, {
@@ -32,10 +37,21 @@ const getMyBookings = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteBooking = catchAsync(async (req: Request, res: Response) => {
-  const traineeId = req.user._id;
+  const traineeId = req.user.id;
   const { id } = req.params;
-
+  console.log(traineeId, id);
   const result = await bookingService.deleteBooking(id, traineeId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Booking cancelled successfully',
+    data: result,
+  });
+});
+
+const allBooking = catchAsync(async (req: Request, res: Response) => {
+  const result = await bookingService.allBooking();
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -49,4 +65,5 @@ export const bookingController = {
   createBooking,
   getMyBookings,
   deleteBooking,
+  allBooking,
 };

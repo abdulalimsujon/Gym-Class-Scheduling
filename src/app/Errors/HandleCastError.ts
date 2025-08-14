@@ -1,12 +1,15 @@
 import mongoose from 'mongoose';
-import { TErrorSources, TgenericRerrorResponse } from '../interface/error.interface';
+import {
+  TErrorSources,
+  TgenericRerrorResponse,
+} from '../interface/error.interface';
 
 const handleCastError = (
   error: mongoose.Error.CastError,
 ): TgenericRerrorResponse => {
   const errorSources: TErrorSources = [
     {
-      path: error?.path,
+      field: error?.path,
       message: error.message,
     },
   ];
@@ -16,7 +19,7 @@ const handleCastError = (
   return {
     statusCode,
     message: 'validation error',
-    errorSources,
+    errorDetails: errorSources,
   };
 };
 

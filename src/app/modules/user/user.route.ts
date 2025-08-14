@@ -19,12 +19,12 @@ router.delete('/delete/:id', Auth(UserRole.ADMIN), userController.remove);
 // Profile routes (All roles)
 router.get(
   '/profile',
-  Auth(UserRole.ADMIN, UserRole.TRAINEE, UserRole.TRAINER),
+  Auth(UserRole.ADMIN, UserRole.TRAINEE),
   userController.getProfile,
 );
 router.put(
   '/setting/profile',
-  Auth(UserRole.ADMIN, UserRole.TRAINEE, UserRole.TRAINER),
+  Auth(UserRole.ADMIN, UserRole.TRAINEE),
   userController.updateProfile,
 );
 

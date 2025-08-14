@@ -5,30 +5,40 @@ import AppError from '../../Errors/AppError';
 import httpStatus from 'http-status';
 import { Types } from 'mongoose';
 import { ClassScheduleModel } from '../class/class.model';
+import { UserRole } from '../user/user.interface';
+import { IBooking } from './booking.inferface';
 
-const createBooking = async (
-  traineeId: Types.ObjectId,
-  classScheduleId: string,
-) => {
-  const classData = await ClassScheduleModel.findById(classScheduleId);
-  if (!classData)
-    throw new AppError(httpStatus.NOT_FOUND, 'Class schedule not found.');
+const createBooking = async (payload: IBooking) => {
+  const { trainee, classSchedule, userRole } = payload;
 
-  const currentBookings = await BookingModel.countDocuments({
-    classSchedule: classScheduleId,
-    isDeleted: false,
-  });
+  // 1️⃣ Check role
+  if (userRole !== UserRole.TRAINEE) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Only trainees can book classes.');
+  }
 
-  const capacity = classData.capacity || 10;
-  if (currentBookings >= capacity) {
+  // 2️⃣ Reduce class capacity atomically
+  const classData = await ClassScheduleModel.findOneAndUpdate(
+    {
+      _id: classSchedule,
+      isDeleted: false,
+      capacity: { $gt: 0 },
+    },
+    {
+      $inc: { capacity: -1 },
+    },
+    { new: true },
+  );
+
+  if (!classData) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      `This class schedule is full. Maximum ${capacity} trainees allowed per schedule.`,
+      'This class is full or does not exist.',
     );
   }
 
+  // 3️⃣ Check overlapping bookings
   const existingBookings = await BookingModel.find({
-    trainee: traineeId,
+    trainee,
     isDeleted: false,
   }).populate('classSchedule');
 
@@ -47,6 +57,11 @@ const createBooking = async (
       (bookedStart >= newStart && bookedStart < newEnd);
 
     if (isOverlap) {
+      // rollback capacity increment
+      await ClassScheduleModel.findByIdAndUpdate(classSchedule, {
+        $inc: { capacity: 1 },
+      });
+
       throw new AppError(
         httpStatus.BAD_REQUEST,
         'You already have a booking at this time slot.',
@@ -54,9 +69,10 @@ const createBooking = async (
     }
   }
 
-  return BookingModel.create({
-    trainee: traineeId,
-    classSchedule: classScheduleId,
+  // 4️⃣ Create booking
+  return await BookingModel.create({
+    trainee,
+    classSchedule,
   });
 };
 
@@ -66,18 +82,26 @@ const getMyBookings = async (traineeId: Types.ObjectId) => {
     .sort({ createdAt: -1 });
 };
 
-const deleteBooking = async (bookingId: string, traineeId: Types.ObjectId) => {
+const deleteBooking = async (bookingId: string, traineeId: string) => {
+  if (!Types.ObjectId.isValid(bookingId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Invalid booking ID.');
+  }
+
+  // Convert traineeId string to ObjectId
+  const traineeObjectId = new Types.ObjectId(traineeId);
+
   const booking = await BookingModel.findOne({
     _id: bookingId,
-    trainee: traineeId,
+    trainee: traineeObjectId,
     isDeleted: false,
   });
 
-  if (!booking)
+  if (!booking) {
     throw new AppError(
       httpStatus.NOT_FOUND,
       'Booking not found or already cancelled.',
     );
+  }
 
   booking.isDeleted = true;
   await booking.save();
@@ -85,8 +109,14 @@ const deleteBooking = async (bookingId: string, traineeId: Types.ObjectId) => {
   return { message: 'Booking cancelled successfully.' };
 };
 
+const allBooking = async () => {
+  const result = await BookingModel.find({ isDeleted: false });
+  return result;
+};
+
 export const bookingService = {
   createBooking,
   getMyBookings,
   deleteBooking,
+  allBooking,
 };

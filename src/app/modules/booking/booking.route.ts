@@ -4,21 +4,21 @@ import { bookingController } from './booking.controller';
 import Auth from '../../middleware/Auth';
 import { UserRole } from '../user/user.interface';
 
-
 const router = express.Router();
 
 router.post(
-  '/bookings',
+  '/create-bookings',
   Auth(UserRole.TRAINEE),
   bookingController.createBooking,
 );
 router.get(
-  '/bookings',
+  '/my-bookings',
   Auth(UserRole.TRAINEE),
   bookingController.getMyBookings,
 );
+router.get('/all-bookings', Auth(UserRole.ADMIN), bookingController.allBooking);
 router.delete(
-  '/bookings/:id',
+  '/delete-bookings/:id',
   Auth(UserRole.TRAINEE),
   bookingController.deleteBooking,
 );

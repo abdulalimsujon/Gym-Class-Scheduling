@@ -13,5 +13,6 @@ const bookingSchema = new Schema<IBooking>(
   },
   { timestamps: true },
 );
+bookingSchema.index({ trainee: 1, classSchedule: 1 }, { unique: true });
 
 export const BookingModel = model<IBooking>('Booking', bookingSchema);
