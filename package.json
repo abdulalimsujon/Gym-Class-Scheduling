@@ -5,13 +5,10 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "lint-fix": "npx eslint src --fix",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint src --ignore-path .eslintignore --ext .ts",
-    "format": "prettier --ignore-path .gitignore --write \"./src **/*.+(js|ts|json)\"",
-    "prettier-fix": "npx prettier --write src",
+    "mo": "node scripts/generate-module.js",
+    "start": "node ./dist/server.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "start:prod": "node ./dist/server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
