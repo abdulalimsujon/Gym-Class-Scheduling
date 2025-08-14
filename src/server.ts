@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from "mongoose";
 import config from "./app/config";
-import { Server } from "http";
 import app from "./app";
 import bcrypt from "bcrypt";
 import { UserModel } from "./app/modules/user/user.model";
 import { UserRole } from "./app/modules/user/user.interface";
-let server: Server;
+
+let isConnected = false;
 
 // Admin seeding function
 const seedAdmin = async () => {
@@ -30,37 +31,24 @@ const seedAdmin = async () => {
   console.log("Admin user seeded successfully.");
 };
 
-async function main() {
-  try {
+const connectDB = async () => {
+  if (!isConnected) {
     await mongoose.connect(config.database_url as string);
+    isConnected = true;
     console.log("MongoDB connected.");
-
-    // Seed admin before starting server
     await seedAdmin();
-
-    server = app.listen(config.port, () => {
-      console.log(`Server listening on port ${config.port}`);
-    });
-  } catch (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
   }
+};
+
+export default async function handler(req: any, res: any) {
+  await connectDB();
+  return app(req, res);
 }
 
-// Handle unhandled rejections
-process.on("unhandledRejection", (reason) => {
-  console.error("Unhandled Rejection detected:", reason);
-  if (server) {
-    server.close(() => process.exit(1));
-  } else {
-    process.exit(1);
-  }
-});
-
-// Handle uncaught exceptions
-process.on("uncaughtException", (error) => {
-  console.error("Uncaught Exception detected:", error);
-  process.exit(1);
-});
-
-main();
+if (process.env.NODE_ENV !== "production") {
+  connectDB().then(() => {
+    app.listen(config.port, () => {
+      console.log(`Server listening on port ${config.port}`);
+    });
+  });
+}

@@ -1,9 +1,9 @@
-import { ClassScheduleModel } from './class.model';
-import { Types } from 'mongoose';
-import httpStatus from 'http-status';
-import AppError from '../../Errors/AppError';
-import { IClassSchedule } from './class.interface';
-import { UserModel } from '../user/user.model';
+import { ClassScheduleModel } from "./class.model";
+import { Types } from "mongoose";
+import httpStatus from "http-status";
+import AppError from "../../Errors/AppError";
+import { IClassSchedule } from "./class.interface";
+import { UserModel } from "../user/user.model";
 
 const createClass = async (payload: {
   date: Date;
@@ -15,7 +15,7 @@ const createClass = async (payload: {
     isDeleted: false,
   });
   if (!existingTrainer) {
-    throw new AppError(httpStatus.BAD_REQUEST, 'Trainer not found or deleted');
+    throw new AppError(httpStatus.BAD_REQUEST, "Trainer not found or deleted");
   }
 
   const startOfDay = new Date(date);
@@ -32,7 +32,7 @@ const createClass = async (payload: {
   if (count >= 5) {
     throw new AppError(
       httpStatus.BAD_REQUEST,
-      'Daily class schedule limit (5) reached.',
+      "Daily class schedule limit (5) reached."
     );
   }
 
@@ -42,18 +42,21 @@ const createClass = async (payload: {
 
 const getAllClasses = async () => {
   return ClassScheduleModel.find({ isDeleted: false }).populate(
-    'trainer',
-    'name email role',
+    "trainer",
+    "name email role"
   );
 };
 
 const getSingleClass = async (id: string) => {
+  const cleanId = id.trim(); // removes spaces, tabs, newlines
+
   const singleClass = await ClassScheduleModel.findOne({
-    _id: id,
+    _id: cleanId,
     isDeleted: false,
-  }).populate('trainer', 'name email role');
+  }).populate("trainer", "name email role");
+
   if (!singleClass) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Class not found');
+    throw new AppError(httpStatus.NOT_FOUND, "Class not found");
   }
   return singleClass;
 };
@@ -62,10 +65,10 @@ const updateClass = async (id: string, payload: Partial<IClassSchedule>) => {
   const updatedClass = await ClassScheduleModel.findOneAndUpdate(
     { _id: id, isDeleted: false },
     payload,
-    { new: true },
+    { new: true }
   );
   if (!updatedClass) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Class not found');
+    throw new AppError(httpStatus.NOT_FOUND, "Class not found");
   }
   return updatedClass;
 };
@@ -75,10 +78,10 @@ const deleteClass = async (id: string): Promise<IClassSchedule> => {
   const deletedClass = await ClassScheduleModel.findOneAndUpdate(
     { _id: id, isDeleted: false },
     { isDeleted: true },
-    { new: true },
+    { new: true }
   );
   if (!deletedClass) {
-    throw new AppError(httpStatus.NOT_FOUND, 'Class not found');
+    throw new AppError(httpStatus.NOT_FOUND, "Class not found");
   }
   return deletedClass;
 };
@@ -86,7 +89,7 @@ const getMyClasses = async (userId: Types.ObjectId) => {
   return ClassScheduleModel.find({
     trainer: userId,
     isDeleted: false,
-  }).populate('trainer', 'name email role');
+  }).populate("trainer", "name email role");
 };
 
 export const classService = {
