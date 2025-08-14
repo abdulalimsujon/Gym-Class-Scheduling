@@ -242,13 +242,13 @@ json
 }
 
 
-Gym Class Scheduling – Setup Guide
-1. Clone the Repository
-git clone https://github.com/abdulalimsujon/Gym-Class-Scheduling.git
-cd Gym-Class-Scheduling
-2. Install Dependencies
+### Gym Class Scheduling – Setup Guide
+### 1. Clone the Repository
+## git clone https://github.com/abdulalimsujon/Gym-Class-Scheduling.git
+## cd Gym-Class-Scheduling
+### 2. Install Dependencies
 npm install
-3. Configure Environment Variables
+### 3. Configure Environment Variables
 Create a .env file in the project root and add the following:
 PORT=5000
 NODE_ENV=production
@@ -256,15 +256,15 @@ NODE_ENV=production
 # Database Configuration
 DATABASE_URL=mongodb://127.0.0.1:27017/gym-management
 
-# Security & Authentication
-SALT_ROUND=10
-JWT_SECRET=your_jwt_secret
-JWT_EXPIRES_IN=1d              # Access token expiry
-JWT_ACCESSTOKEN=gsdklgklsjdfl  # Optional: Additional secret for access token
-JWT_REFRESH_TOKEN=fashfka      # Optional: Refresh token secret
-4. Start the Development Server
-npm run start:dev
-5. Access the API
+#### Security & Authentication
+  SALT_ROUND=10
+ JWT_SECRET=your_jwt_secret
+# JWT_EXPIRES_IN=1d              # Access token expiry
+# JWT_ACCESSTOKEN=gsdklgklsjdfl  # Optional: Additional secret for access token
+#  JWT_REFRESH_TOKEN=fashfka      # Optional: Refresh token secret
+####  4. Start the Development Server
+# npm run start:dev
+### 5. Access the API
 Once the server is running, you can access the API at:
 http://localhost:5000/api/v1
 
