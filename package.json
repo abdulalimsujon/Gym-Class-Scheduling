@@ -5,10 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "mo": "node scripts/generate-module.js",
-    "start": "node ./dist/server.js",
+    "lint-fix": "npx eslint src --fix",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint src --ignore-path .eslintignore --ext .ts",
+    "format": "prettier --ignore-path .gitignore --write \"./src **/*.+(js|ts|json)\"",
+    "prettier-fix": "npx prettier --write src",
     "start:dev": "ts-node-dev --respawn --transpile-only src/server.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:prod": "node ./dist/server.js"
   },
   "keywords": [],
   "author": "",
@@ -29,8 +32,8 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
-    "@types/cookie-parser": "^1.4.9",
-    "@types/jsonwebtoken": "^9.0.10",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/validator": "^13.12.2",
     "@typescript-eslint/eslint-plugin": "^7.17.0",
     "@typescript-eslint/parser": "^7.17.0",
