@@ -204,10 +204,8 @@ CopyEdit
 }
 ________________________________________
 
-
-
-
-  User Credentials
+## User Credentials
+  
 Trainee:
 {
   "email": "john@gmail3.com",
@@ -225,7 +223,23 @@ json
   "password": "securePass123"
 }
 
+### Trainee:
+{
+  "email": "john@gmail3.com",
+  "password": "securePass123"
+}
+### Admin:
 
+{
+  "email": "admin@example.com",
+  "password": "Admin@123"
+}
+### Trainer:
+
+{
+  "email": "trainer2@gmail.com",
+  "password": "securePass123"
+}
 
 
 Gym Class Scheduling – Setup Guide
